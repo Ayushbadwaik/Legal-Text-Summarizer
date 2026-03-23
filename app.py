@@ -6,9 +6,7 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# ── PUT YOUR OPENROUTER API KEY HERE ──
-# Get FREE key (no credit card): https://openrouter.ai → Sign Up → Keys
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = "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"
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
