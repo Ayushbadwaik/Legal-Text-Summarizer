@@ -6,6 +6,7 @@ import os
 app = Flask(__name__)
 CORS(app)
 
+# API key from Render Environment Variable
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -16,9 +17,25 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/debug")
+def debug():
+    key = os.environ.get("OPENROUTER_API_KEY", "")
+    return jsonify({
+        "key_set": bool(key),
+        "key_length": len(key),
+        "key_preview": key[:10] + "..." if key else "EMPTY"
+    })
+
+
 @app.route("/summarize", methods=["POST"])
 def summarize():
     try:
+        # Re-read key fresh on every request
+        api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
+
+        if not api_key:
+            return jsonify({"error": "API key not configured on server. Please set OPENROUTER_API_KEY environment variable on Render."}), 500
+
         data = request.get_json(force=True, silent=True)
         if not data:
             return jsonify({"error": "Invalid JSON body."}), 400
@@ -43,15 +60,13 @@ def summarize():
         )
 
         headers = {
-            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+            "Authorization": "Bearer " + api_key,
             "Content-Type": "application/json",
             "HTTP-Referer": "https://lexai.onrender.com",
             "X-Title": "LexAI Legal Summarizer",
         }
 
         payload = {
-            # openrouter/free auto-picks the best available free model every time
-            # It NEVER breaks even when individual models go down
             "model": "openrouter/free",
             "messages": [
                 {
