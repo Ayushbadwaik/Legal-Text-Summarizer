@@ -34,7 +34,7 @@ def summarize():
         api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
 
         if not api_key:
-            return jsonify({"error": "API key not configured on server. Please set OPENROUTER_API_KEY environment variable on Render."}), 500
+            return jsonify({"error": "API key not configured on server.. Please set OPENROUTER_API_KEY environment variable on Render."}), 500
 
         data = request.get_json(force=True, silent=True)
         if not data:
